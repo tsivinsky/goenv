@@ -27,3 +27,25 @@ func main() {
 ```
 
 Under the hood, `goenv` use [godotenv](https://github.com/joho/godotenv) for loading variables from .env file
+
+## Rules
+
+### `required`
+
+```go
+type Env struct {
+    VAR string `env:"VAR,required"`
+}
+```
+
+This will result in runtime error if VAR env doesn't exist
+
+### `default=`
+
+```go
+type Env struct {
+    VAR string `env:"VAR,default=var`
+}
+```
+
+This will set value for `Env.VAR` as `var` if no other value is provided (including empty string)
