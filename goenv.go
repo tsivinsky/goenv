@@ -33,6 +33,11 @@ func Load[T any](s *T) error {
 				return errors.New(fmt.Sprintf("Env %s is required", envName))
 			}
 
+			defaultValue := getEnvDefaultValue(env)
+			if val == "" {
+				val = defaultValue
+			}
+
 			f := s.Field(i)
 			if f.IsValid() && f.CanSet() {
 				f.SetString(val)
