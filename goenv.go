@@ -19,6 +19,8 @@ func Load[T any](s *T) error {
 	v := reflect.ValueOf(*s)
 	ptr := reflect.ValueOf(s)
 
+	errs := []error{}
+
 	for i := 0; i < v.Type().NumField(); i++ {
 		s := ptr.Elem()
 
@@ -30,7 +32,7 @@ func Load[T any](s *T) error {
 			val := os.Getenv(envName)
 
 			if isEnvRequired(env) && val == "" {
-				return errors.New(fmt.Sprintf("Env %s is required", envName))
+				errs = append(errs, fmt.Errorf("Env %s is required", envName))
 			}
 
 			defaultValue := getEnvDefaultValue(env)
@@ -43,6 +45,10 @@ func Load[T any](s *T) error {
 				f.SetString(val)
 			}
 		}
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
 	}
 
 	return nil
