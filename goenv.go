@@ -27,7 +27,7 @@ func Load[T any](s *T) error {
 		return errors.New("value should be a struct")
 	}
 
-	for i := 0; i < v.Type().NumField(); i++ {
+	for i := range v.Type().NumField() {
 		env := v.Type().Field(i).Tag.Get("env")
 		sl := strings.Split(env, ",")
 
