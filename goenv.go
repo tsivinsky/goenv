@@ -21,29 +21,31 @@ func Load[T any](s *T) error {
 
 	errs := []error{}
 
+	str := ptr.Elem()
+
+	if str.Kind() != reflect.Struct {
+		return errors.New("value should be a struct")
+	}
+
 	for i := 0; i < v.Type().NumField(); i++ {
-		s := ptr.Elem()
+		env := v.Type().Field(i).Tag.Get("env")
+		sl := strings.Split(env, ",")
 
-		if s.Kind() == reflect.Struct {
-			env := v.Type().Field(i).Tag.Get("env")
-			sl := strings.Split(env, ",")
+		envName := sl[0]
+		val := os.Getenv(envName)
 
-			envName := sl[0]
-			val := os.Getenv(envName)
+		if isEnvRequired(env) && val == "" {
+			errs = append(errs, fmt.Errorf("Env %s is required", envName))
+		}
 
-			if isEnvRequired(env) && val == "" {
-				errs = append(errs, fmt.Errorf("Env %s is required", envName))
-			}
+		defaultValue := getEnvDefaultValue(env)
+		if val == "" {
+			val = defaultValue
+		}
 
-			defaultValue := getEnvDefaultValue(env)
-			if val == "" {
-				val = defaultValue
-			}
-
-			f := s.Field(i)
-			if f.IsValid() && f.CanSet() {
-				f.SetString(val)
-			}
+		f := str.Field(i)
+		if f.IsValid() && f.CanSet() {
+			f.SetString(val)
 		}
 	}
 
