@@ -57,7 +57,7 @@ func Load[T any](s *T) error {
 }
 
 func MustLoad[T any](s *T) {
-	err := Load[T](s)
+	err := Load(s)
 	if err != nil {
 		panic(err)
 	}
