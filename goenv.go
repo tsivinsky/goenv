@@ -10,10 +10,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Load[T any](s *T) error {
-	err := godotenv.Load()
-	if err != nil {
-		return err
+func Load[T any](s *T, loadEnvFile bool) error {
+	if loadEnvFile {
+		err := godotenv.Load()
+		if err != nil {
+			return err
+		}
 	}
 
 	v := reflect.ValueOf(*s)
@@ -56,8 +58,8 @@ func Load[T any](s *T) error {
 	return nil
 }
 
-func MustLoad[T any](s *T) {
-	err := Load(s)
+func MustLoad[T any](s *T, loadEnvFile bool) {
+	err := Load(s, loadEnvFile)
 	if err != nil {
 		panic(err)
 	}
